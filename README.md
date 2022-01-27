@@ -4,7 +4,9 @@ It leverages Unsplash API.
 
 ## Register an Unsplash.com ApplicationID
 * Register an application at [UNSPLASH Developer program](https://unsplash.com/oauth/applications)
-* Edit ImageMasonry.tsx - and change **<your-unsplash-clientId>** with your client id from Unsplash.
+* Create an .env file in the root folder and put in...
+
+    `REACT_APP_UNSPLASH_API_KEY=<you-client-id>`
 * Make sure you honor the rules of the Unsplash Developer Program when making any changes.
 
 ## Run the code & debug in Office

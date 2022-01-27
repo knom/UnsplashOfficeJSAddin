@@ -8,6 +8,8 @@ const webpack = require("webpack");
 const urlDev = "https://localhost:3000/";
 const urlProd = "https://www.contoso.com/"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
 
+require('dotenv').config({ path: './.env' }); 
+
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();
   return { cacert: httpsOptions.ca, key: httpsOptions.key, cert: httpsOptions.cert };
@@ -109,6 +111,7 @@ module.exports = async (env, options) => {
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
       }),
+      new webpack.EnvironmentPlugin(['REACT_APP_UNSPLASH_API_KEY'])
     ],
     devServer: {
       hot: true,

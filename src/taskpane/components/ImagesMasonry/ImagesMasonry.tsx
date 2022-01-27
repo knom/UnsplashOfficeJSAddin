@@ -25,7 +25,7 @@ export interface ImagesMasonryState {
 export default class ImagesMasonry extends React.Component<ImagesMasonryProps, ImagesMasonryState> {
   masonryParent: React.RefObject<any>;
   infScroll: InfiniteScroll;
-  unsplashClientId: string = "<your-unsplash-clientId>";
+  unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY;
   pageSize = 30;
 
   constructor(props: ImagesMasonryProps, context) {
