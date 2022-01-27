@@ -1,4 +1,5 @@
-import App from "./components/App";
+// "document": "https://microsofteur-my.sharepoint.com/:p:/g/personal/mknor_microsoft_com/EU427BGQCFVEhU8thT4KDFYBLObgxjBqaGor0-ktg8AXGw?e=yMJbnO"
+import App from "./components/App/App";
 import { AppContainer } from "react-hot-loader";
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
 import { ThemeProvider } from "@fluentui/react";
@@ -11,7 +12,7 @@ initializeIcons();
 
 let isOfficeInitialized = false;
 
-const title = "Contoso Task Pane Add-in";
+const title = "Unsplash Photos Add-in";
 
 const render = (Component) => {
   ReactDOM.render(
@@ -31,8 +32,8 @@ Office.initialize = () => {
 };
 
 if ((module as any).hot) {
-  (module as any).hot.accept("./components/App", () => {
-    const NextApp = require("./components/App").default;
+  (module as any).hot.accept("./components/App/App", () => {
+    const NextApp = require("./components/App/App").default;
     render(NextApp);
   });
 }

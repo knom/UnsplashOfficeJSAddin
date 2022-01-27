@@ -74,31 +74,3 @@ ul {
   color: #005a9e;
   cursor: pointer;
 }
-
-b {
-  font-weight: bold;
-}
-
-.imgContainer img.selected-Image {
-  outline: 5px solid #b7472a;
-  outline-offset: -5px;
-}
-
-.imgContainer img {
-  border-radius: 5px;
-}
-
-div#imageList {
-  margin-top: 55px;
-}
-
-div#header{
-    position: fixed;
-    top: 0px;
-    z-index: 1;
-    background: white
-}
-
-div#container{
-    margin: 10px;
-}

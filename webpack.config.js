@@ -49,9 +49,23 @@ module.exports = async (env, options) => {
           exclude: /node_modules/,
         },
         {
+          // css-loader
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader', 'postcss-loader'],
+        },
+        {
+          // sass/scss loader to load sass-scss style files
+          test: /\.(sass|scss)$/,
+          use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+        },
+        {
           test: /\.html$/,
           exclude: /node_modules/,
           use: "html-loader",
+        },
+        {
+          test: /\.svg$/,
+          use: ['@svgr/webpack'],
         },
         {
           test: /\.(png|jpg|jpeg|gif|ico)$/,

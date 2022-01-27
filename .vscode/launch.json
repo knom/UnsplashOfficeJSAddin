@@ -6,7 +6,7 @@
   "configurations": [
     {
       "name": "Excel Desktop (Edge Chromium)",
-      "type": "edge",
+      "type": "pwa-msedge",
       "request": "attach",
       "useWebView": "advanced",
       "port": 9229,
@@ -28,7 +28,7 @@
     },
     {
       "name": "Outlook Desktop (Edge Chromium)",
-      "type": "edge",
+      "type": "pwa-msedge",
       "request": "attach",
       "useWebView": "advanced",
       "port": 9229,
@@ -50,7 +50,7 @@
     },
     {
       "name": "PowerPoint Desktop (Edge Chromium)",
-      "type": "edge",
+      "type": "pwa-msedge",
       "request": "attach",
       "useWebView": "advanced",
       "port": 9229,
@@ -72,7 +72,7 @@
     },
     {
       "name": "Word Desktop (Edge Chromium)",
-      "type": "edge",
+      "type": "pwa-msedge",
       "request": "attach",
       "useWebView": "advanced",
       "port": 9229,
