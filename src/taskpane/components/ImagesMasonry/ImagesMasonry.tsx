@@ -60,7 +60,8 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
       history: false,
     });
 
-    this.infScroll.on('request', (r) => console.log("Request", r));
+    this.infScroll.on('request', (r) => { console.log("Request", r) });
+    this.infScroll.on('error', (err) => { console.log("Error", err); });
 
     this.infScroll.on('load', (response) => {
       console.log("Load");

@@ -3,8 +3,11 @@ declare module "infinite-scroll"
     class InfiniteScroll {
         constructor(masonryContainer: HTMLElement, conf: Config);
 
-        on(event: "request", handler: (request: any) => void): void;
-        on(event: "load", handler: (data: Unsplash.Response, url: string) => void): void;
+        on(event: "append", handler: (body: Unsplash.Response, path: string, items: any, response: Response) => void): void;
+        on(event: "last", handler: (body: Unsplash.Response, path: string) => void): void;
+        on(event: "error", handler: (error: string, path: string, response: Response) => void): void;
+        on(event: "request", handler: (path: string, fetchPromise: Promise<any>) => void): void;
+        on(event: "load", handler: (data: Unsplash.Response, path: string, response: Response) => void): void;
 
         loadNextPage(): void;
 
