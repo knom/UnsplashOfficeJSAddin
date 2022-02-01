@@ -26,3 +26,5 @@ steps:
 - script: |
     npm run build
   displayName: 'npm build'
+  env:
+    "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
