@@ -30,16 +30,16 @@ stages:
         - script: |
             sed -i 's/https:\/\/www.contoso.com\//$(prod_url)/g' ./webpack.config.js
           displayName: Replace Production URL in office manifest
-        
-        - script: |
-            mv ./manifest.prod.xml manifest.xml
-          displayName: Rename manifest.prod.xml to manifest.xml
 
         - script: |
             npm run build
           displayName: 'npm build'
           env:
             "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
+        
+        - script: |
+            mv ./dist/manifest.prod.xml ./dist/manifest.xml
+          displayName: Rename manifest.prod.xml to manifest.xml
 
         - publish: $(System.DefaultWorkingDirectory)/dist/
           displayName: 'Publish DIST folder as artifact'
