@@ -1,30 +1,43 @@
 trigger:
 - main
+stages:
+  - stage: Build
+    pool:
+      vmImage: ubuntu-latest
+    displayName: Build
+    jobs:
+      - job: Build
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+          displayName: 'Install Node.js'
 
-pool:
-  vmImage: ubuntu-latest
+        - script: |
+            npm install
+          displayName: 'npm install'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+        - script: |
+            npm run lint
+          displayName: 'Lint Code'
 
-- script: |
-    npm install
-  displayName: 'npm install'
+        - script: |
+            npm run validate
+          displayName: 'Validate office.xml file'
 
-- script: |
-    npm run lint
-  displayName: 'Lint Code'
+        - script: |
+            npm run build
+          displayName: 'npm build'
+          env:
+            "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
 
-- script: |
-    npm run validate
-  displayName: 'Validate office.xml file'
+        - publish: $(System.DefaultWorkingDirectory)/dist/
+          displayName: 'Publish DIST folder as artifact'
+          artifact: WebApp
 
 
-- script: |
-    npm run build
-  displayName: 'npm build'
-  env:
-    "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
+  - stage: DeployTest
+    pool:
+      vmImage: ubuntu-latest
+    displayName: Deploy to Test Environment
+    dependsOn: Build
