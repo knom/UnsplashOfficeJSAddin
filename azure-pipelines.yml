@@ -1,12 +1,14 @@
 trigger:
 - main
+pool:
+    vmImage: ubuntu-latest
 stages:
   - stage: Build
-    pool:
-      vmImage: ubuntu-latest
     displayName: Build
     jobs:
       - job: Build
+        variables:
+          prod_url: $[replace(variables['WEBSERVER_URL'], '/', '\/')]
         steps:
         - task: NodeTool@0
           inputs:
@@ -26,6 +28,14 @@ stages:
           displayName: 'Validate office.xml file'
 
         - script: |
+            sed -i 's/https://www.contoso.com//$(prod_url)/g' ./manifest.prod.xml
+          displayName: Replace Production URL in office manifest
+        
+        - script: |
+            mv ./manifest.prod.xml manifest.xml
+          displayName: Rename manifest.prod.xml to manifest.xml
+
+        - script: |
             npm run build
           displayName: 'npm build'
           env:
@@ -37,9 +47,15 @@ stages:
 
 
   - stage: DeployTest
-    pool:
-      vmImage: ubuntu-latest
     displayName: Deploy to Test Environment
     dependsOn: Build
     jobs:
       - job: Deploy
+        steps:
+          - download: 
+            artifact: WebApp
+          - task: AzureStaticWebApp@0
+            inputs:
+              skip_app_build: true
+              verbose: true
+              azure_static_web_apps_api_token: '$(Deployment_Token)'
