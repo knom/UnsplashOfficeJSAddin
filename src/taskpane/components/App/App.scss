@@ -35,6 +35,11 @@ div#container2 {
   height: 25px;
 }
 
+.searchIcon {
+  color: white;
+  font-weight: bold;
+}
+
 .hidden {
   visibility: hidden;
 }
@@ -77,6 +82,7 @@ div#container2 {
 .grid_item img {
   border-radius: $searchImage_outline;
 }
+
 .grid_item canvas {
   border-radius: $searchImage_outline;
 }

@@ -1,4 +1,3 @@
-// "document": "https://microsofteur-my.sharepoint.com/:p:/g/personal/mknor_microsoft_com/EU427BGQCFVEhU8thT4KDFYBLObgxjBqaGor0-ktg8AXGw?e=yMJbnO"
 import App from "./components/App/App";
 import { AppContainer } from "react-hot-loader";
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
@@ -6,7 +5,7 @@ import { ThemeProvider } from "@fluentui/react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-/* global document, Office, module, require */
+/* global Office */
 
 initializeIcons();
 
@@ -14,7 +13,7 @@ let isOfficeInitialized = false;
 
 const title = "Unsplash Photos Add-in";
 
-const render = (Component) => {
+const render = (Component: any) => {
   ReactDOM.render(
     <AppContainer>
       <ThemeProvider>
@@ -26,10 +25,10 @@ const render = (Component) => {
 };
 
 /* Render application after Office initializes */
-Office.initialize = () => {
+Office.onReady().then(() => {
   isOfficeInitialized = true;
   render(App);
-};
+});
 
 if ((module as any).hot) {
   (module as any).hot.accept("./components/App/App", () => {

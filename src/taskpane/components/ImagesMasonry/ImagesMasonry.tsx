@@ -1,19 +1,18 @@
 import * as React from "react";
-import { renderToString } from "react-dom/server"
+import { renderToString } from "react-dom/server";
 import Masonry from "react-masonry-component";
-import './ImagesMasonry.scss';
 import * as lodash from "lodash";
-import InfiniteScroll from 'infinite-scroll';
-import imagesLoaded from 'imagesloaded';
-import CheckMarkSvg from './checkmark.svg';
+import InfiniteScroll from "infinite-scroll";
+import imagesLoaded from "imagesloaded";
+import CheckMarkSvg from "./checkmark.svg";
 import { Icon } from "@fluentui/react";
-
-/* global console, Office, require */
-
+import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
+import "./ImagesMasonry.scss";
 export interface ImagesMasonryProps {
   searchTerm: string;
   selectedImages: Unsplash.Image[];
-  onSelectedImagesChanged: (images: Unsplash.Image[]) => void;
+  // eslint-disable-next-line no-unused-vars
+  onSelectedImagesChanged(images: Unsplash.Image[]): void;
 }
 
 export interface ImagesMasonryState {
@@ -24,12 +23,12 @@ export interface ImagesMasonryState {
 
 export default class ImagesMasonry extends React.Component<ImagesMasonryProps, ImagesMasonryState> {
   masonryParent: React.RefObject<any>;
-  infScroll: InfiniteScroll;
-  unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY;
+  infScroll!: InfiniteScroll<Unsplash.Response>;
+  unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY as string;
   pageSize = 30;
 
-  constructor(props: ImagesMasonryProps, context) {
-    super(props, context);
+  constructor(props: ImagesMasonryProps) {
+    super(props);
     this.state = {
       searchResults: [],
       selectedSearchResults: [],
@@ -45,25 +44,30 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
 
     const _this = this;
 
-    let gridDiv = (masonry.element) as HTMLDivElement;
+    let gridDiv = masonry.element as HTMLDivElement;
     gridDiv.addEventListener("click", this.searchResultImageClick);
 
     this.infScroll = new InfiniteScroll(gridDiv, {
-      append: '.grid_item',
+      append: ".grid_item",
       outlayer: masonry,
-      path: function () {
+      // eslint-disable-next-line no-unused-vars
+      path: function (this: InfiniteScroll<Unsplash.Image[]>) {
         return `https://api.unsplash.com/search/photos?query=${_this.props.searchTerm}&per_page=${_this.pageSize}&client_id=${_this.unsplashClientId}&page=${this.pageIndex}`;
       },
       // load response as JSON
-      responseBody: 'json',
-      status: '.page-load-status',
+      responseBody: "json",
+      status: ".page-load-status",
       history: false,
     });
 
-    this.infScroll.on('request', (r) => { console.log("Request", r) });
-    this.infScroll.on('error', (err) => { console.log("Error", err); });
+    this.infScroll.on("request", (r) => {
+      console.log("Request", r);
+    });
+    this.infScroll.on("error", (err) => {
+      console.log("Error", err);
+    });
 
-    this.infScroll.on('load', (response) => {
+    this.infScroll.on("load", (response) => {
       console.log("Load");
 
       let list = _this.state.searchResults;
@@ -71,7 +75,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
       _this.setState({ searchResults: list });
 
       // compile body data into HTML
-      let itemsHTML = response.results.map((v, i) => renderToString(getItemHTML(v, i))).join('');
+      let itemsHTML = response.results.map((v, i) => renderToString(getItemHTML(v, i))).join("");
 
       var tmp = document.implementation.createHTMLDocument("");
       tmp.body.innerHTML = itemsHTML;
@@ -81,33 +85,31 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
       imagesLoaded(items, () => {
         gridDiv.append(...items);
         _this.masonryParent.current.performLayout();
-        this.infScroll.isLoading = false;
+        this.infScroll!.isLoading = false;
       });
     });
 
     function getItemHTML(item: Unsplash.Image, idx: number) {
-      let i = (_this.pageSize * (_this.infScroll.pageIndex - 2)) + idx;
+      let i = _this.pageSize * (_this.infScroll!.pageIndex - 2) + idx;
 
-      return (<div
-        key={i}
-        data-index={i}
-        className="grid_item"
-      >
-        <img src={item.urls.thumb} alt={item.description} />
-        <CheckMarkSvg className="checkmarkIcon hidden" />
-        {/* <Spinner size={SpinnerSize.medium} className="hidden" /> */}
-        <div className="overlay ms-fontSize-12">
-          {lodash.truncate(item.description, { length: 30, separator: ' ' }) || "Photo"} by {item.user.name}
-          &nbsp;
-          <a href={item.links.html} title="Open Image in Browser">
-            <Icon iconName="OpenInNewTab" />
-          </a>
+      return (
+        <div key={i} data-index={i} className="grid_item">
+          <img src={item.urls.thumb} alt={item.description} />
+          <CheckMarkSvg className="checkmarkIcon hidden" />
+          {/* <Spinner size={SpinnerSize.medium} className="hidden" /> */}
+          <div className="overlay ms-fontSize-12">
+            {lodash.truncate(item.description, { length: 30, separator: " " }) || "Photo"} by {item.user.name}
+            &nbsp;
+            <a href={item.links.html} title="Open Image in Browser">
+              <Icon iconName="OpenInNewTab" />
+            </a>
+          </div>
         </div>
-      </div>);
+      );
     }
   }
 
-  componentDidUpdate(prevProps: Readonly<ImagesMasonryProps>, _prevState: Readonly<ImagesMasonryState>) {
+  componentDidUpdate(prevProps: Readonly<ImagesMasonryProps>) {
     if (prevProps.searchTerm != this.props.searchTerm) {
       this.clearSelection();
       this.resetMasonry();
@@ -193,7 +195,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
 
     this.masonryParent.current.masonry.items = [];
 
-    let gridDiv = (this.masonryParent.current.masonry.element) as HTMLDivElement;
+    let gridDiv = this.masonryParent.current.masonry.element as HTMLDivElement;
     gridDiv.textContent = "";
 
     window.scroll(0, 0);
@@ -211,19 +213,18 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
 
     const grid_item = el.closest(".grid_item");
 
-    const img_item = grid_item.querySelector("img");
-    img_item.classList.toggle("selected-Image");
+    const img_item = grid_item?.querySelector("img");
+    img_item?.classList.toggle("selected-Image");
 
-    const checkmark_item = grid_item.querySelector(".checkmarkIcon");
-    checkmark_item.classList.toggle("hidden");
+    const checkmark_item = grid_item?.querySelector(".checkmarkIcon");
+    checkmark_item?.classList.toggle("hidden");
 
+    // Get all selected images in HTML
     var elements = [...masonry.element.querySelectorAll(".selected-Image")];
     console.log(`${elements.length} images selected`);
 
     this.setState({ selectedImageCount: elements.length });
 
-    // Get all selected images in HTML
-    var elements = [...masonry.element.querySelectorAll(".selected-Image")];
     // Get their IDs
     var ids = elements.map((val) => Number.parseInt(val.parentElement.dataset.index));
 
@@ -240,11 +241,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
 
     return (
       <div id="imageList">
-        <Masonry
-          options={{ fitWidth: true, gutter: 5, itemSelector: '.grid_item' }}
-          ref={this.masonryParent}
-        >
-        </Masonry>
+        <Masonry options={{ fitWidth: true, gutter: 5, itemSelector: ".grid_item" }} ref={this.masonryParent}></Masonry>
       </div>
     );
   }
