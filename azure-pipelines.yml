@@ -52,10 +52,11 @@ stages:
     jobs:
       - job: Deploy
         steps:
-          - download: 
+          - download: current
             artifact: WebApp
           - task: AzureStaticWebApp@0
             inputs:
+              app_location: 'WebApp'
               skip_app_build: true
               verbose: true
               azure_static_web_apps_api_token: '$(Deployment_Token)'
