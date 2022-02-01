@@ -28,7 +28,7 @@ stages:
           displayName: 'Validate office.xml file'
 
         - script: |
-            sed -i 's/https://www.contoso.com//$(prod_url)/g' ./manifest.prod.xml
+            sed -i 's/https:\/\/www.contoso.com\//$(prod_url)/g' ./webpack.config.js
           displayName: Replace Production URL in office manifest
         
         - script: |
