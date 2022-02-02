@@ -24,10 +24,6 @@ stages:
         - script: |
             npm run validate
           displayName: 'Validate office.xml file'
-        
-        - script: |
-            mv ./manifest.prod.xml manifest.xml
-          displayName: Rename manifest.prod.xml to manifest.xml
 
         - script: |
             npm run build
@@ -35,6 +31,11 @@ stages:
           env:
             "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
             "Webserver_Url": $(Webserver_Url)
+        
+                    
+        - script: |
+            mv ./dist/manifest.prod.xml ./dist/manifest.xml
+          displayName: Rename manifest.prod.xml to manifest.xml
 
         - publish: $(System.DefaultWorkingDirectory)/dist/
           displayName: 'Publish DIST folder as artifact'
