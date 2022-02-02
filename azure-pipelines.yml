@@ -55,8 +55,8 @@ stages:
             artifact: WebApp
           - task: AzureStaticWebApp@0
             inputs:
-              workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
+              #workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
               skip_app_build: true
-              app_location: ./Webapp/
+              app_location: Webapp/
               verbose: true
               azure_static_web_apps_api_token: '$(Deployment_Token)'
