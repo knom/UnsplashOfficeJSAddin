@@ -6,9 +6,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const urlDev = "https://localhost:3000/";
-const urlProd = "https://www.contoso.com/"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
+const urlProd = undefined; // this will come from ENV variable most of the time
 
-require('dotenv').config({ path: './.env' }); 
+require("dotenv").config({ path: "./.env" });
 
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();
@@ -16,6 +16,13 @@ async function getHttpsOptions() {
 }
 
 module.exports = async (env, options) => {
+  const url = process.env.Webserver_Url ?? env.Webserver_Url ?? urlProd;
+
+  if (url === undefined) {
+    console.log("URL paramter needs to be set!");
+    process.exit(-1);
+  }
+
   const dev = options.mode === "development";
   const buildType = dev ? "dev" : "prod";
   const config = {
@@ -92,7 +99,7 @@ module.exports = async (env, options) => {
               if (dev) {
                 return content;
               } else {
-                return content.toString().replace(new RegExp(urlDev, "g"), urlProd);
+                return content.toString().replace(new RegExp(urlDev, "g"), url);
               }
             },
           },
@@ -108,10 +115,15 @@ module.exports = async (env, options) => {
         template: "./src/commands/commands.html",
         chunks: ["commands"],
       }),
+      new HtmlWebpackPlugin({
+        filename: "index.html",
+        template: "./src/index.html",
+        chunks: ["index"],
+      }),
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
       }),
-      new webpack.EnvironmentPlugin(['REACT_APP_UNSPLASH_API_KEY'])
+      new webpack.EnvironmentPlugin(["REACT_APP_UNSPLASH_API_KEY"]),
     ],
     devServer: {
       hot: true,
