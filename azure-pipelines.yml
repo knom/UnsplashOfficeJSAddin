@@ -54,5 +54,6 @@ stages:
             inputs:
               workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
               skip_app_build: true
+              app_location: /
               verbose: true
               azure_static_web_apps_api_token: '$(Deployment_Token)'
