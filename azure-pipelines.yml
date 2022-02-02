@@ -45,15 +45,18 @@ stages:
   - stage: DeployTest
     displayName: Deploy to Test Environment
     dependsOn: Build
+    variables:
+      skipComponentGovernanceDetection: true
     jobs:
       - job: Deploy
         steps:
+          - checkout: none
           - download: current
             artifact: WebApp
           - task: AzureStaticWebApp@0
             inputs:
               workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
               skip_app_build: true
-              app_location: ./
+              app_location: ./Webapp/
               verbose: true
               azure_static_web_apps_api_token: '$(Deployment_Token)'
