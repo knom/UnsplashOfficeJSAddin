@@ -31,7 +31,6 @@ stages:
           env:
             "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
             "Webserver_Url": $(Webserver_Url)
-        
                     
         - script: |
             mv ./dist/manifest.prod.xml ./dist/manifest.xml
@@ -53,6 +52,12 @@ stages:
           - checkout: none
           - download: current
             artifact: WebApp
+          - script: |
+              ls -lahR ./
+          - script: |
+              ls -lahR $(System_DefaultWorkingDirectory)
+          - script: |
+              ls -lahR $(System.DefaultWorkingDirectory)
           - task: AzureStaticWebApp@0
             inputs:
               #workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
