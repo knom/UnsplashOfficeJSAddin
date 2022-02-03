@@ -52,15 +52,9 @@ stages:
           - checkout: none
           - download: current
             artifact: WebApp
-          - script: |
-              ls -lahR ./
-          - script: |
-              ls -lahR $(System_DefaultWorkingDirectory)
-          - script: |
-              ls -lahR $(System.DefaultWorkingDirectory)
           - task: AzureStaticWebApp@0
             inputs:
-              #workingDirectory: '$(System.DefaultWorkingDirectory)/WebApp/'
+              workingDirectory: '$(Pipeline.Workspace)'
               skip_app_build: true
               app_location: WebApp/
               azure_static_web_apps_api_token: '$(Deployment_Token)'
