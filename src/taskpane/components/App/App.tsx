@@ -80,7 +80,7 @@ export default class App extends React.Component<AppProps, AppState> {
       })
     ).then(() => {
       // Insert Unsplash logo
-      this.getBase64ImageAsync("/assets/icon-filled.png").then((unsplashLogo) => {
+      this.getBase64ImageAsync("/assets/icon-128.png").then((unsplashLogo) => {
         Office.context.document.setSelectedDataAsync(
           unsplashLogo,
           {
