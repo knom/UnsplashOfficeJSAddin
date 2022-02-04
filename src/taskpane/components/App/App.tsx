@@ -108,7 +108,9 @@ export default class App extends React.Component<AppProps, AppState> {
       xhr.onload = function () {
         var reader = new FileReader();
         reader.onloadend = () => {
-          resolve(reader.result as string);
+          const regex = /data:image\/[a-z0-9]*;base64,/i;
+          const base64Image = (reader.result as string).replace(regex, "");
+          resolve(base64Image);
         };
         reader.onerror = (err) => reject(err);
         reader.readAsDataURL(xhr.response);
@@ -136,8 +138,6 @@ export default class App extends React.Component<AppProps, AppState> {
     return new Promise<void>((resolve, reject) => {
       this.getBase64ImageAsync(image.urls.full)
         .then((base64Image: string) => {
-          const regex = /data:image\/[a-z0-9]*;base64,/i;
-          base64Image = base64Image.replace(regex, "");
           // links.download_location
           this.insertIntoPptAsync(base64Image, {
             coercionType: Office.CoercionType.Image,
