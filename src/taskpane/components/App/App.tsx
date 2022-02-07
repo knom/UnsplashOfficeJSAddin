@@ -147,7 +147,8 @@ export default class App extends React.Component<AppProps, AppState> {
           })
             .catch((reason) => reject(reason))
             .then(() => {
-              // fetch(image.links.download);
+              // trigger download link
+              fetch(image.links.download).catch((reason) => console.log(reason));
 
               // const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
               const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
