@@ -40,7 +40,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
 
   componentDidMount() {
     const masonry = this.masonryParent.current.masonry;
-    console.log("componentDidMount");
+    console.debug("componentDidMount()");
 
     const _this = this;
 
@@ -61,14 +61,14 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
     });
 
     this.infScroll.on("request", (r) => {
-      console.log("Request", r);
+      console.debug("InfiniteScroll Request", r);
     });
     this.infScroll.on("error", (err) => {
-      console.log("Error", err);
+      console.error("InfiniteScroll Error", err);
     });
 
     this.infScroll.on("load", (response) => {
-      console.log("Load");
+      console.debug("InfiniteScroll Load");
 
       let list = _this.state.searchResults;
       list = list.concat(response.results);
@@ -110,69 +110,24 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
   }
 
   componentDidUpdate(prevProps: Readonly<ImagesMasonryProps>) {
+    console.debug("componentDidUpdate()", prevProps);
+
     if (prevProps.searchTerm != this.props.searchTerm) {
+      console.debug("New search term --> clear masonry selection & rendering");
       this.clearSelection();
       this.resetMasonry();
     }
 
     if (!lodash.isEqual(prevProps.selectedImages, this.props.selectedImages) && this.props.selectedImages.length == 0) {
+      console.debug("Different image selection --> reset masonry selection");
       this.setState({ selectedSearchResults: this.props.selectedImages });
 
       this.clearSelection();
-
-      //   const removed = lodash.difference(prevProps.selectedImages, this.props.selectedImages);
-      //   const added = lodash.difference(this.props.selectedImages, prevProps.selectedImages);
-
-      //   if (removed.length > 0) {
-      //     const melement = this.masonryParent.current.masonry.element;
-
-      //     var ids = removed.map((i) => this.state.searchResults.indexOf(i));
-
-      //     var removedEls = [...melement.querySelectorAll(".grid_item")]
-      //       .filter((_v, idx) => ids.indexOf(idx) !== -1);
-
-      //     removedEls.forEach((el) => {
-      //       const img_item = el.querySelector("img");
-      //       img_item.classList.remove("selected-Image");
-
-      //       const checkmark_item = el.querySelector(".checkmarkIcon");
-      //       checkmark_item.classList.add("hidden");
-
-      //       const spinner = el.querySelector(".ms-Spinner");
-      //       spinner.classList.add("hidden");
-      //     });
-
-      //     this.setState({ selectedSearchResults: this.props.selectedImages });
-      //     this.setState({ selectedImageCount: this.props.selectedImages.length });
-      //   }
-      // }
-
-      // if (prevProps.showSelectedSpinner != this.props.showSelectedSpinner) {
-      //   const melement = this.masonryParent.current.masonry.element;
-
-      //   if (this.props.showSelectedSpinner == false) {
-      //     var elements = [...melement.querySelectorAll(".ms-Spinner")];
-      //     elements.forEach(el => el.classList.add("hidden"));
-      //   }
-      //   else {
-      //     var elements = [...melement.querySelectorAll(".selected-Image")].map((el) => el.closest(".grid_item"));
-
-      //     elements.forEach((el) => {
-      //       const img_item = el.querySelector("img");
-      //       img_item.classList.remove("selected-Image");
-
-      //       const checkmark_item = el.querySelector(".checkmarkIcon");
-      //       checkmark_item.classList.add("hidden");
-
-      //       const spinner = el.querySelector(".ms-Spinner");
-      //       spinner.classList.remove("hidden");
-      //     });
-      //   }
-      // }
     }
   }
 
   private clearSelection() {
+    console.debug("Clearing selection...");
     const melement = this.masonryParent.current.masonry.element;
 
     var elements = [...melement.querySelectorAll(".selected-Image")].map((el) => el.closest(".grid_item"));
@@ -189,6 +144,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
   }
 
   private resetMasonry() {
+    console.debug("Resetting masonry to empty and reloading first page...");
     this.setState({ searchResults: [] });
     this.setState({ selectedImageCount: 0 });
     this.setState({ selectedSearchResults: [] });
@@ -207,6 +163,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
   }
 
   private searchResultImageClick = async (e: MouseEvent) => {
+    console.debug("SearchResult Image clicked...");
     const masonry = this.masonryParent.current.masonry;
 
     let el = e.target as HTMLElement;
@@ -237,7 +194,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
   };
 
   render() {
-    console.log("render", this.state);
+    console.debug("render()", this.state);
 
     return (
       <div id="imageList">

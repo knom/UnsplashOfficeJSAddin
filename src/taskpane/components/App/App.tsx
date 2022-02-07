@@ -25,6 +25,7 @@ export interface AppState {
 
 export default class App extends React.Component<AppProps, AppState> {
   pageSize = 30;
+  unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY as string;
 
   constructor(props: AppProps) {
     super(props);
@@ -39,26 +40,11 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
-    console.log("componentDidMount");
-    // this.setState({
-    //   listItems: [
-    //     {
-    //       icon: "Ribbon",
-    //       primaryText: "Achieve more with Office integration",
-    //     },
-    //     {
-    //       icon: "Unlock",
-    //       primaryText: "Unlock features and functionality",
-    //     },
-    //     {
-    //       icon: "Design",
-    //       primaryText: "Create and visualize like a pro",
-    //     },
-    //   ],
-    // });
+    console.debug("componentDidMount()");
   }
 
   btnSearchClick = () => {
+    console.debug("btnSearch got clicked");
     this.setState({ masonrySearchTerm: this.state.searchBoxText });
   };
 
@@ -68,6 +54,7 @@ export default class App extends React.Component<AppProps, AppState> {
   };
 
   btnInsertClick = () => {
+    console.debug("btnInsert got clicked");
     const selectedImages = this.state.selectedImages;
 
     // Insert all selected images
@@ -81,6 +68,7 @@ export default class App extends React.Component<AppProps, AppState> {
     ).then(() => {
       // Insert Unsplash logo
       this.getBase64ImageAsync("/assets/icon-128.png").then((unsplashLogo) => {
+        console.debug("Inserting unsplash logo");
         Office.context.document.setSelectedDataAsync(
           unsplashLogo,
           {
@@ -91,12 +79,15 @@ export default class App extends React.Component<AppProps, AppState> {
           },
           (asyncResult) => {
             if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-              console.log(asyncResult.error.message);
+              console.error("❎ Error inserting unsplash logo", asyncResult.error.message);
+            } else {
+              console.debug("✅ Successfully inserted unsplash logo");
             }
           }
         );
       });
 
+      console.debug("Resetting selected images to 0");
       this.setState({ selectedImageCount: 0 });
       this.setState({ selectedImages: [] });
     });
@@ -104,15 +95,20 @@ export default class App extends React.Component<AppProps, AppState> {
 
   getBase64ImageAsync = (url: string) => {
     return new Promise<string>((resolve, reject) => {
+      console.debug(`Downloading ${url} as base64`);
       var xhr = new XMLHttpRequest();
       xhr.onload = function () {
         var reader = new FileReader();
         reader.onloadend = () => {
+          console.debug(`✅ Downloaded ${url} as base64 successfully`);
           const regex = /data:image\/[a-z0-9]*;base64,/i;
           const base64Image = (reader.result as string).replace(regex, "");
           resolve(base64Image);
         };
-        reader.onerror = (err) => reject(err);
+        reader.onerror = (err) => {
+          console.error(`❎ Error downloading ${url} as base64`);
+          reject(err);
+        };
         reader.readAsDataURL(xhr.response);
       };
       xhr.open("GET", url);
@@ -123,11 +119,13 @@ export default class App extends React.Component<AppProps, AppState> {
 
   insertIntoPptAsync = (image: string, options: Office.SetSelectedDataOptions) => {
     return new Promise<void>((resolve, reject) => {
+      console.debug(`Inserting image into document`);
       Office.context.document.setSelectedDataAsync(image, options, function (asyncResult) {
         if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-          console.log(asyncResult.error.message);
+          console.error(`❎ Error inserting image into Office document:`, asyncResult.error.message);
           reject(asyncResult.error.message);
         } else {
+          console.debug(`✅ Inserted image into Office document successfully`);
           resolve();
         }
       });
@@ -136,6 +134,8 @@ export default class App extends React.Component<AppProps, AppState> {
 
   insertImageAsync = (image: Unsplash.Image) => {
     return new Promise<void>((resolve, reject) => {
+      console.debug("Downloading & inserting image, credit and logo");
+
       this.getBase64ImageAsync(image.urls.full)
         .then((base64Image: string) => {
           // links.download_location
@@ -147,7 +147,11 @@ export default class App extends React.Component<AppProps, AppState> {
           })
             .catch((reason) => reject(reason))
             .then(() => {
-              // fetch(image.links.download);
+              console.debug(`Tracking download on ${image.links.download_location}`);
+              // trigger download link
+              fetch(image.links.download_location + `&client_id=${this.unsplashClientId}`).catch((reason) =>
+                console.error("❎ Error tracking download of the image", reason)
+              );
 
               // const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
               const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
@@ -156,7 +160,10 @@ export default class App extends React.Component<AppProps, AppState> {
                 coercionType: Office.CoercionType.Text,
               })
                 .catch((reason) => reject(reason))
-                .then(() => resolve());
+                .then(() => {
+                  console.debug("✅ Successfully Downloaded & inserted image, credit and logo");
+                  resolve();
+                });
             });
         })
         .catch((reason) => reject(reason));
@@ -172,7 +179,7 @@ export default class App extends React.Component<AppProps, AppState> {
   // }
 
   render() {
-    console.log("render", this.state);
+    console.debug("render()", this.state);
     const { title, isOfficeInitialized } = this.props;
 
     if (!isOfficeInitialized) {
@@ -191,17 +198,6 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     return (
-      // <div className="ms-welcome">
-      //   <Header logo={require("./../../../assets/logo-filled.png")} title={this.props.title} message="Welcome" />
-      //   <HeroList message="Discover what Office Add-ins can do for you today!" items={this.state.listItems}>
-      //     <p className="ms-font-l">
-      //       Modify the source files, then click <b>Run</b>.
-      //     </p>
-      //     <DefaultButton className="ms-welcome__action" iconProps={{ iconName: "ChevronRight" }} onClick={this.click}>
-      //       Run
-      //     </DefaultButton>
-      //   </HeroList>
-      // </div>
       <div id="container2">
         <div id="header">
           <Stack horizontal wrap tokens={{ childrenGap: 10, padding: 10 }}>
