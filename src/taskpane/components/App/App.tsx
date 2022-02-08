@@ -63,6 +63,8 @@ export default class App extends React.Component<AppProps, AppState> {
         this.insertImageAsync(v).then(() => {
           const si = this.state.selectedImages.filter((p) => p != v);
           this.setState({ selectedImages: si });
+
+          Office.addin.hide();
         });
       })
     ).then(() => {
