@@ -1,88 +1,23 @@
 @import "@fluentui/react/dist/sass/References";
 
-$powerpoint_color: #b7472a;
-$searchImage_outline: 5px;
-
 b {
   font-weight: bold;
 }
 
-div#imageList {
-  margin-top: 55px;
-}
-
 div#header {
-  position: fixed;
-  top: 0px;
-  left: 0px;
+  // position: fixed;
+  // top: 0px;
+  // left: 0px;
   width: 100%;
   z-index: 1;
   background: white;
 }
 
 div#container2 {
-  margin: 10px;
-}
-
-/* The overlay effect - lays on top of the container and over the image */
-.checkmarkIcon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin-top: 10px;
-  margin-right: 10px;
-  width: 25px;
-  height: 25px;
+  // margin: 10px;
 }
 
 .searchIcon {
   color: white;
   font-weight: bold;
-}
-
-.hidden {
-  visibility: hidden;
-}
-
-.overlay {
-  position: absolute;
-  margin-bottom: 10px;
-  bottom: 0;
-  background: rgb(0, 0, 0);
-  background: rgba(0, 0, 0, 0.5); /* Black see-through */
-  color: #f1f1f1;
-  width: 100%;
-  transition: 0.5s ease;
-  opacity: 0;
-  color: white;
-  font-size: $ms-font-size-16;
-  padding: 20px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.overlay a {
-  text-decoration: none;
-  color: white;
-}
-.overlay a:hover {
-  text-decoration: underline;
-}
-
-/* When you mouse over the container, fade in the overlay title */
-.grid_item:hover .overlay {
-  opacity: 1;
-}
-
-.grid_item img.selected-Image {
-  outline: $searchImage_outline solid $powerpoint_color;
-  outline-offset: -$searchImage_outline;
-}
-
-.grid_item img {
-  border-radius: $searchImage_outline;
-}
-
-.grid_item canvas {
-  border-radius: $searchImage_outline;
 }
