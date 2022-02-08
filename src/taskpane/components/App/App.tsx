@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DefaultButton, PrimaryButton, SearchBox, Stack } from "@fluentui/react";
+import { DefaultButton, Pivot, PivotItem, PrimaryButton, ScrollablePane, SearchBox, Stack } from "@fluentui/react";
 import Progress from "../Progress";
 import ImagesMasonry from "../ImagesMasonry/ImagesMasonry";
 import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
@@ -199,46 +199,53 @@ export default class App extends React.Component<AppProps, AppState> {
 
     return (
       <div id="container2">
-        <div id="header">
-          <Stack horizontal wrap tokens={{ childrenGap: 10, padding: 10 }}>
-            <Stack.Item>
-              <img src="assets/icon-32.png" alt="Unsplash logo" />
-            </Stack.Item>
-            <Stack.Item>
-              <SearchBox
-                styles={{ root: { width: "180px" } }}
-                value={this.state.searchBoxText ?? ""}
-                placeholder="Search for photos"
-                onChange={(_ev, newValue) => this.setState({ searchBoxText: newValue === undefined ? "" : newValue })}
-                onSearch={() => this.btnSearchClick()}
-              />
-            </Stack.Item>
-            <Stack.Item>
-              <PrimaryButton className="ms-Button ms-Button--primary" onClick={this.btnSearchClick}>
-                <span>
-                  <i className="ms-Icon ms-Icon--Search searchIcon"></i>
-                </span>
-                &nbsp;
-                <span className="ms-Button-label">Search</span>
-              </PrimaryButton>
-            </Stack.Item>
-            <Stack.Item>
-              <DefaultButton
-                className="ms-Button"
-                disabled={this.state.selectedImageCount == 0}
-                onClick={this.btnInsertClick}
-              >
-                <span className="ms-Button-label">Insert {selectedImagesHtml}</span>
-              </DefaultButton>
-            </Stack.Item>
-          </Stack>
-        </div>
-        <ImagesMasonry
-          searchTerm={this.state.masonrySearchTerm}
-          onSelectedImagesChanged={this.handleSelectedImagesChanged}
-          // showSelectedSpinner={this.state.showSelectedSpinner}
-          selectedImages={this.state.selectedImages}
-        />
+        <Pivot>
+          <PivotItem headerText="Search" itemIcon="search">
+            <div id="header">
+              <Stack horizontal wrap tokens={{ childrenGap: 10, padding: 10 }}>
+                <Stack.Item>
+                  <img src="assets/icon-32.png" alt="Unsplash logo" />
+                </Stack.Item>
+                <Stack.Item>
+                  <SearchBox
+                    styles={{ root: { width: "180px" } }}
+                    value={this.state.searchBoxText ?? ""}
+                    placeholder="Search for photos"
+                    onChange={(_ev, newValue) => this.setState({ searchBoxText: newValue === undefined ? "" : newValue })}
+                    onSearch={() => this.btnSearchClick()}
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <PrimaryButton className="ms-Button ms-Button--primary" onClick={this.btnSearchClick}>
+                    <span>
+                      <i className="ms-Icon ms-Icon--Search searchIcon"></i>
+                    </span>
+                    &nbsp;
+                    <span className="ms-Button-label">Search</span>
+                  </PrimaryButton>
+                </Stack.Item>
+                <Stack.Item>
+                  <DefaultButton
+                    className="ms-Button"
+                    disabled={this.state.selectedImageCount == 0}
+                    onClick={this.btnInsertClick}
+                  >
+                    <span className="ms-Button-label">Insert {selectedImagesHtml}</span>
+                  </DefaultButton>
+                </Stack.Item>
+              </Stack>
+            </div>
+            <ImagesMasonry
+              searchTerm={this.state.masonrySearchTerm}
+              onSelectedImagesChanged={this.handleSelectedImagesChanged}
+              // showSelectedSpinner={this.state.showSelectedSpinner}
+              selectedImages={this.state.selectedImages}
+            />
+          </PivotItem>
+          <PivotItem headerText="Settings" itemIcon="settings">
+            Foo
+          </PivotItem>
+        </Pivot>
       </div>
     );
   }
