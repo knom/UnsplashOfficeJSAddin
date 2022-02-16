@@ -4,7 +4,8 @@ $powerpoint_color: #b7472a;
 $searchImage_outline: 5px;
 
 div#imageList {
-  margin-top: 55px;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
 }
 
 /* The overlay effect - lays on top of the container and over the image */

@@ -1,13 +1,13 @@
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import Masonry from "react-masonry-component";
-import * as lodash from "lodash";
 import InfiniteScroll from "infinite-scroll";
 import imagesLoaded from "imagesloaded";
 import CheckMarkSvg from "./checkmark.svg";
 import { Icon } from "@fluentui/react";
 import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
 import "./ImagesMasonry.scss";
+import { Utils } from "../../../Utils";
 export interface ImagesMasonryProps {
   searchTerm: string;
   selectedImages: Unsplash.Image[];
@@ -99,7 +99,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
           {/* <Spinner size={SpinnerSize.medium} className="hidden" /> */}
           <div className="overlay ms-fontSize-12">
             <a href={item.links.html} title="Open Image in Browser" target="_blank" rel="noreferrer">
-              {lodash.truncate(item.description, { length: 30, separator: " " }) || "Photo"} by {item.user.name}
+              {Utils.truncateString(item.description, 30, "...") || "Photo"} by {item.user.name}
               &nbsp;
               <Icon iconName="OpenInNewTab" />
             </a>
@@ -118,7 +118,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
       this.resetMasonry();
     }
 
-    if (!lodash.isEqual(prevProps.selectedImages, this.props.selectedImages) && this.props.selectedImages.length == 0) {
+    if (!Utils.isEqual(prevProps.selectedImages, this.props.selectedImages) && this.props.selectedImages.length == 0) {
       console.debug("Different image selection --> reset masonry selection");
       this.setState({ selectedSearchResults: this.props.selectedImages });
 
