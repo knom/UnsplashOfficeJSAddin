@@ -62,4 +62,4 @@ stages:
               and(
                 not(failed()), 
                 not(canceled()), 
-                eq(variables['Build.Reason'], 'PullRequest')
+                not(eq(variables['Build.Reason'], 'PullRequest'))
