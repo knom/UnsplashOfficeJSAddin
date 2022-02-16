@@ -63,3 +63,4 @@ stages:
                 not(failed()), 
                 not(canceled()), 
                 not(eq(variables['Build.Reason'], 'PullRequest'))
+              )
