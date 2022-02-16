@@ -98,9 +98,9 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
           <CheckMarkSvg className="checkmarkIcon hidden" />
           {/* <Spinner size={SpinnerSize.medium} className="hidden" /> */}
           <div className="overlay ms-fontSize-12">
-            {lodash.truncate(item.description, { length: 30, separator: " " }) || "Photo"} by {item.user.name}
-            &nbsp;
-            <a href={item.links.html} title="Open Image in Browser">
+            <a href={item.links.html} title="Open Image in Browser" target="_blank" rel="noreferrer">
+              {lodash.truncate(item.description, { length: 30, separator: " " }) || "Photo"} by {item.user.name}
+              &nbsp;
               <Icon iconName="OpenInNewTab" />
             </a>
           </div>

@@ -1,9 +1,10 @@
 import * as React from "react";
-import { DefaultButton, PrimaryButton, SearchBox, Stack } from "@fluentui/react";
+import { DefaultButton, Icon, Panel, PanelType, SearchBox, Stack, TeachingBubble, Toggle } from "@fluentui/react";
 import Progress from "../Progress";
 import ImagesMasonry from "../ImagesMasonry/ImagesMasonry";
 import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
 import "./App.scss";
+import { ISettingsManager, IUnsplashAddinSettings, OfficeSettingsManager } from "../Settings/ISettingsManager";
 
 // import Header from "../Header";
 // import HeroList, { HeroListItem } from "../HeroList";
@@ -18,14 +19,18 @@ export interface AppProps {
 export interface AppState {
   // listItems: HeroListItem[];
   searchBoxText: string;
+  teachingBubbleVisible: boolean;
   selectedImageCount: number;
   selectedImages: Unsplash.Image[];
   masonrySearchTerm: string;
+  settingsPanelVisible: boolean;
+  settings: IUnsplashAddinSettings;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
   pageSize = 30;
   unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY as string;
+  settingsManager: ISettingsManager;
 
   constructor(props: AppProps) {
     super(props);
@@ -36,16 +41,67 @@ export default class App extends React.Component<AppProps, AppState> {
       selectedImages: [],
       searchBoxText: "",
       masonrySearchTerm: "",
+      teachingBubbleVisible: false,
+      settingsPanelVisible: false,
+      settings: new IUnsplashAddinSettings(),
     };
+
+    this.settingsManager = new OfficeSettingsManager();
+
+    this.settingsManager.loadAsync().then((settings) => {
+      console.debug("✅ Settings loaded", settings);
+      this.setState({ settings: settings });
+
+      if (settings.teachingBubbleNeverShown) {
+        console.debug("Showing teaching bubble once", settings);
+        this.setState({ teachingBubbleVisible: true });
+
+        settings.teachingBubbleNeverShown = false;
+        this.settingsManager.save(settings);
+      }
+    });
   }
 
   componentDidMount() {
     console.debug("componentDidMount()");
   }
 
+  toggleInsertLogoChanged = (_ev: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean) => {
+    console.debug("Toggle Insert Unsplash Logo got clicked");
+
+    let s = this.state.settings;
+    s.insertUnsplashLogo = checked ?? true;
+    this.setState({ settings: s });
+
+    this.settingsManager.save(s);
+  };
+
+  toggleInsertAuthorChanged = (_ev: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean) => {
+    console.debug("Toggle Insert Unsplash Author got clicked");
+
+    let s = this.state.settings;
+    s.insertUnsplashAuthor = checked ?? true;
+    this.setState({ settings: s });
+
+    this.settingsManager.save(s);
+  };
+
+  btnResetSettings = () => {
+    console.debug("btnResetSettings got clicked");
+
+    const s = new IUnsplashAddinSettings();
+    this.setState({ settings: s });
+    this.settingsManager.save(s);
+  };
+
   btnSearchClick = () => {
     console.debug("btnSearch got clicked");
     this.setState({ masonrySearchTerm: this.state.searchBoxText });
+  };
+
+  btnSettingsClick = () => {
+    console.debug("btnSettingsClick got clicked");
+    this.setState({ settingsPanelVisible: true });
   };
 
   handleSelectedImagesChanged = (images: Unsplash.Image[]) => {
@@ -66,26 +122,28 @@ export default class App extends React.Component<AppProps, AppState> {
         });
       })
     ).then(() => {
-      // Insert Unsplash logo
-      this.getBase64ImageAsync("/assets/icon-128.png").then((unsplashLogo) => {
-        console.debug("Inserting unsplash logo");
-        Office.context.document.setSelectedDataAsync(
-          unsplashLogo,
-          {
-            coercionType: Office.CoercionType.Image,
-            imageLeft: 0,
-            imageTop: 0,
-            imageWidth: 100,
-          },
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-              console.error("❎ Error inserting unsplash logo", asyncResult.error.message);
-            } else {
-              console.debug("✅ Successfully inserted unsplash logo");
+      if (this.state.settings.insertUnsplashLogo) {
+        // Insert Unsplash logo
+        this.getBase64ImageAsync("/assets/icon-128.png").then((unsplashLogo) => {
+          console.debug("Inserting unsplash logo");
+          Office.context.document.setSelectedDataAsync(
+            unsplashLogo,
+            {
+              coercionType: Office.CoercionType.Image,
+              imageLeft: 0,
+              imageTop: 0,
+              imageWidth: 100,
+            },
+            (asyncResult) => {
+              if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+                console.error("❎ Error inserting unsplash logo", asyncResult.error.message);
+              } else {
+                console.debug("✅ Successfully inserted unsplash logo");
+              }
             }
-          }
-        );
-      });
+          );
+        });
+      }
 
       console.debug("Resetting selected images to 0");
       this.setState({ selectedImageCount: 0 });
@@ -153,17 +211,24 @@ export default class App extends React.Component<AppProps, AppState> {
                 console.error("❎ Error tracking download of the image", reason)
               );
 
-              // const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
-              const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
+              if (this.state.settings.insertUnsplashAuthor) {
+                // Insert Unsplash author reference
+                console.debug(`Inserting Unsplash author reference`);
+                // const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
+                const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
 
-              this.insertIntoPptAsync(credit, {
-                coercionType: Office.CoercionType.Text,
-              })
-                .catch((reason) => reject(reason))
-                .then(() => {
-                  console.debug("✅ Successfully Downloaded & inserted image, credit and logo");
-                  resolve();
-                });
+                this.insertIntoPptAsync(credit, {
+                  coercionType: Office.CoercionType.Text,
+                })
+                  .catch((reason) => reject(reason))
+                  .then(() => {
+                    console.debug("✅ Successfully Downloaded & inserted images (and maybe logo & credits)");
+                    resolve();
+                  });
+              } else {
+                console.debug("✅ Successfully Downloaded & inserted images (and maybe logo & credits)");
+                resolve();
+              }
             });
         })
         .catch((reason) => reject(reason));
@@ -199,6 +264,44 @@ export default class App extends React.Component<AppProps, AppState> {
 
     return (
       <div id="container2">
+        <Panel
+          isOpen={this.state.settingsPanelVisible}
+          onDismiss={() => this.setState({ settingsPanelVisible: false })}
+          // headerText="Info & Settings"
+          type={PanelType.smallFixedFar}
+          isLightDismiss={true}
+        >
+          <h3>About</h3>
+          <h4>Office Addin for Unsplash</h4>
+          <p>Version: LOCAL-DEV</p>
+          <p>© 2022 by knom</p>
+          <p>
+            <a href="https://github.com/knom/UnsplashOfficeJSAddin/issues" target="_blank" rel="noreferrer">
+              Report a bug <Icon iconName="OpenInNewTab" />
+            </a>
+          </p>
+          <h3>Settings</h3>
+          <Toggle
+            label="Insert Unsplash Logo"
+            onText="On"
+            offText="Off"
+            checked={this.state.settings.insertUnsplashLogo}
+            onChange={this.toggleInsertLogoChanged}
+          />
+          <Toggle
+            label="Insert Unsplash Author References"
+            onText="On"
+            offText="Off"
+            checked={this.state.settings.insertUnsplashAuthor}
+            onChange={this.toggleInsertAuthorChanged}
+          />
+          <DefaultButton onClick={this.btnResetSettings}>Reset Settings</DefaultButton>
+          <h3>Unsplash Usage Policy</h3>
+          <a href="https://unsplash.com/license" target="_blank" rel="noreferrer">
+            View Photo License <Icon iconName="OpenInNewTab" />
+          </a>
+        </Panel>
+
         <div id="header">
           <Stack horizontal wrap tokens={{ childrenGap: 10, padding: 10 }}>
             <Stack.Item>
@@ -206,22 +309,43 @@ export default class App extends React.Component<AppProps, AppState> {
             </Stack.Item>
             <Stack.Item>
               <SearchBox
+                id="searchBox"
                 styles={{ root: { width: "180px" } }}
+                showIcon={true}
                 value={this.state.searchBoxText ?? ""}
                 placeholder="Search for photos"
                 onChange={(_ev, newValue) => this.setState({ searchBoxText: newValue === undefined ? "" : newValue })}
                 onSearch={() => this.btnSearchClick()}
+                autoFocus
               />
+              {this.state.teachingBubbleVisible && (
+                <TeachingBubble
+                  target={`#searchBox`}
+                  onDismiss={() => this.setState({ teachingBubbleVisible: false })}
+                  headline="Type your favorite topic to get started..."
+                  primaryButtonProps={{
+                    text: "Get started",
+                    onClick: () => this.setState({ teachingBubbleVisible: false }),
+                  }}
+                >
+                  <p>
+                    Then hit <b>ENTER</b> - and browse through the beautiful photos from <b>Unsplash</b>!
+                  </p>
+                  <p>
+                    Once you&apos;re done browsing around, select your images and press <b>Insert</b> to add them to
+                    your document.
+                  </p>
+                </TeachingBubble>
+              )}
             </Stack.Item>
-            <Stack.Item>
-              <PrimaryButton className="ms-Button ms-Button--primary" onClick={this.btnSearchClick}>
-                <span>
-                  <i className="ms-Icon ms-Icon--Search searchIcon"></i>
-                </span>
-                &nbsp;
-                <span className="ms-Button-label">Search</span>
-              </PrimaryButton>
-            </Stack.Item>
+            {/* <Stack.Item>
+              <PrimaryButton
+                className="ms-Button ms-Button--primary"
+                iconProps={{ iconName: "search" }}
+                onClick={this.btnSearchClick}
+                styles={{ root: { minWidth: 20, paddingRight: 4, paddingLeft: 4 } }}
+              />
+            </Stack.Item> */}
             <Stack.Item>
               <DefaultButton
                 className="ms-Button"
@@ -230,6 +354,14 @@ export default class App extends React.Component<AppProps, AppState> {
               >
                 <span className="ms-Button-label">Insert {selectedImagesHtml}</span>
               </DefaultButton>
+            </Stack.Item>
+            <Stack.Item>
+              <DefaultButton
+                className="ms-Button"
+                iconProps={{ iconName: "settings" }}
+                onClick={this.btnSettingsClick}
+                styles={{ root: { minWidth: 20, paddingRight: 4, paddingLeft: 4 } }}
+              />
             </Stack.Item>
           </Stack>
         </div>
