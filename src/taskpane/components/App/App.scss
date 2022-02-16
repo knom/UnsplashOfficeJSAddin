@@ -5,9 +5,6 @@ b {
 }
 
 div#header {
-  // position: fixed;
-  // top: 0px;
-  // left: 0px;
   width: 100%;
   z-index: 1;
   background: white;
@@ -20,4 +17,9 @@ div#container2 {
 .searchIcon {
   color: white;
   font-weight: bold;
+}
+
+body,
+html {
+  overflow: hidden;
 }
