@@ -22,6 +22,7 @@ declare module "infinite-scroll" {
   interface IConfig {
     append: string;
     outlayer: any;
+    elementScroll?: string;
     path: () => string;
     responseBody: "json" | "xml";
     status: string;

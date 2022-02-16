@@ -50,6 +50,7 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
     this.infScroll = new InfiniteScroll(gridDiv, {
       append: ".grid_item",
       outlayer: masonry,
+      elementScroll: "#imageList",
       // eslint-disable-next-line no-unused-vars
       path: function (this: InfiniteScroll<Unsplash.Image[]>) {
         return `https://api.unsplash.com/search/photos?query=${_this.props.searchTerm}&per_page=${_this.pageSize}&client_id=${_this.unsplashClientId}&page=${this.pageIndex}`;
