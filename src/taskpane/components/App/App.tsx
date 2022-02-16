@@ -23,6 +23,7 @@ export interface AppState {
   selectedImageCount: number;
   selectedImages: Unsplash.Image[];
   masonrySearchTerm: string;
+  masonryHeight: string;
   settingsPanelVisible: boolean;
   settings: IUnsplashAddinSettings;
 }
@@ -31,6 +32,8 @@ export default class App extends React.Component<AppProps, AppState> {
   pageSize = 30;
   unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY as string;
   settingsManager: ISettingsManager;
+  headerElement = React.createRef<HTMLDivElement>();
+  resizeObserver?: ResizeObserver;
 
   constructor(props: AppProps) {
     super(props);
@@ -44,6 +47,7 @@ export default class App extends React.Component<AppProps, AppState> {
       teachingBubbleVisible: false,
       settingsPanelVisible: false,
       settings: new IUnsplashAddinSettings(),
+      masonryHeight: "100hv",
     };
 
     this.settingsManager = new OfficeSettingsManager();
@@ -64,6 +68,18 @@ export default class App extends React.Component<AppProps, AppState> {
 
   componentDidMount() {
     console.debug("componentDidMount()");
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      console.debug("Resize Observer", entries);
+      this.setState({ masonryHeight: `calc(100vh - ${entries[0].contentRect.height}px - 10px)` });
+    });
+    this.resizeObserver.observe(this.headerElement.current!);
+  }
+
+  componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   toggleInsertLogoChanged = (_ev: React.MouseEvent<HTMLElement, MouseEvent>, checked?: boolean) => {
@@ -302,7 +318,7 @@ export default class App extends React.Component<AppProps, AppState> {
           </a>
         </Panel>
 
-        <div id="header">
+        <div id="header" ref={this.headerElement}>
           <Stack horizontal wrap tokens={{ childrenGap: 10, padding: 10 }}>
             <Stack.Item>
               <img src="assets/icon-32.png" alt="Unsplash logo" />
@@ -365,12 +381,14 @@ export default class App extends React.Component<AppProps, AppState> {
             </Stack.Item>
           </Stack>
         </div>
-        <ImagesMasonry
-          searchTerm={this.state.masonrySearchTerm}
-          onSelectedImagesChanged={this.handleSelectedImagesChanged}
-          // showSelectedSpinner={this.state.showSelectedSpinner}
-          selectedImages={this.state.selectedImages}
-        />
+        <div style={{ height: this.state.masonryHeight }}>
+          <ImagesMasonry
+            searchTerm={this.state.masonrySearchTerm}
+            onSelectedImagesChanged={this.handleSelectedImagesChanged}
+            // showSelectedSpinner={this.state.showSelectedSpinner}
+            selectedImages={this.state.selectedImages}
+          />
+        </div>
       </div>
     );
   }

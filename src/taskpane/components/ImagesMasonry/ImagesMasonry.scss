@@ -5,7 +5,7 @@ $searchImage_outline: 5px;
 
 div#imageList {
   overflow-y: auto;
-  height: calc(100vh - 64px);
+  height: 100%;
 }
 
 /* The overlay effect - lays on top of the container and over the image */
