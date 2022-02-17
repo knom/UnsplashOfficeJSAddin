@@ -58,3 +58,9 @@ stages:
               skip_app_build: true
               app_location: WebApp/
               azure_static_web_apps_api_token: '$(Deployment_Token)'
+        condition: 
+              and(
+                not(failed()), 
+                not(canceled()), 
+                not(eq(variables['Build.Reason'], 'PullRequest'))
+              )

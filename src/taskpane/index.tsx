@@ -26,8 +26,10 @@ const render = (Component: any) => {
 
 /* Render application after Office initializes */
 Office.onReady().then(() => {
-  isOfficeInitialized = true;
-  render(App);
+  if (Office.context.host != null) {
+    isOfficeInitialized = true;
+    render(App);
+  }
 });
 
 if ((module as any).hot) {
