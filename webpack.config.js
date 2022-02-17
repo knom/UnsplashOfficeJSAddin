@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const devCerts = require("office-addin-dev-certs");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -60,12 +61,12 @@ module.exports = async (env, options) => {
         {
           // css-loader
           test: /\.css$/,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
+          use: ["style-loader", "css-loader", "postcss-loader"],
         },
         {
           // sass/scss loader to load sass-scss style files
           test: /\.(sass|scss)$/,
-          use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+          use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
         },
         {
           test: /\.html$/,
@@ -74,7 +75,7 @@ module.exports = async (env, options) => {
         },
         {
           test: /\.svg$/,
-          use: ['@svgr/webpack'],
+          use: ["@svgr/webpack"],
         },
         {
           test: /\.(png|jpg|jpeg|gif|ico)$/,
@@ -86,6 +87,7 @@ module.exports = async (env, options) => {
       ],
     },
     plugins: [
+      new BundleAnalyzerPlugin(),
       new CopyWebpackPlugin({
         patterns: [
           {
