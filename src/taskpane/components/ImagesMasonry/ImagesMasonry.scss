@@ -3,25 +3,8 @@
 $powerpoint_color: #b7472a;
 $searchImage_outline: 5px;
 
-b {
-  font-weight: bold;
-}
-
 div#imageList {
   margin-top: 55px;
-}
-
-div#header {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  z-index: 1;
-  background: white;
-}
-
-div#container2 {
-  margin: 10px;
 }
 
 /* The overlay effect - lays on top of the container and over the image */
