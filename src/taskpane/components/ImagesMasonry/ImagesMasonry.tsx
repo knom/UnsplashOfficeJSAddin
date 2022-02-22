@@ -8,6 +8,7 @@ import { Icon } from "@fluentui/react";
 import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
 import "./ImagesMasonry.scss";
 import { Utils } from "../../../Utils";
+import { appInsights } from "../../../AppInsights";
 export interface ImagesMasonryProps {
   searchTerm: string;
   selectedImages: Unsplash.Image[];
@@ -117,6 +118,8 @@ export default class ImagesMasonry extends React.Component<ImagesMasonryProps, I
       console.debug("New search term --> clear masonry selection & rendering");
       this.clearSelection();
       this.resetMasonry();
+
+      appInsights.trackEvent({ name: "Search" });
     }
 
     if (!Utils.isEqual(prevProps.selectedImages, this.props.selectedImages) && this.props.selectedImages.length == 0) {

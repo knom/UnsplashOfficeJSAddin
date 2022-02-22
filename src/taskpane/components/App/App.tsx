@@ -6,6 +6,10 @@ import { Unsplash } from "../ImagesMasonry/UnsplashDTOs";
 import "./App.scss";
 import { ISettingsManager, IUnsplashAddinSettings, OfficeSettingsManager } from "../Settings/ISettingsManager";
 
+import { withAITracking } from "@microsoft/applicationinsights-react-js";
+import { reactPlugin, appInsights } from "../../../AppInsights";
+import { ITelemetryItem } from "@microsoft/applicationinsights-web";
+
 // import Header from "../Header";
 // import HeroList, { HeroListItem } from "../HeroList";
 
@@ -28,7 +32,7 @@ export interface AppState {
   settings: IUnsplashAddinSettings;
 }
 
-export default class App extends React.Component<AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   pageSize = 30;
   unsplashClientId: string = process.env.REACT_APP_UNSPLASH_API_KEY as string;
   settingsManager: ISettingsManager;
@@ -37,6 +41,13 @@ export default class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
+
+    var telemetryInitializer = (envelope: ITelemetryItem) => {
+      envelope.data!.Host = Office.context.diagnostics.host;
+      envelope.data!.Platform = Office.context.diagnostics.platform;
+      envelope.data!.Version = Office.context.diagnostics.version;
+    };
+    appInsights.addTelemetryInitializer(telemetryInitializer);
 
     this.state = {
       // listItems: [],
@@ -116,6 +127,7 @@ export default class App extends React.Component<AppProps, AppState> {
   };
 
   btnSettingsClick = () => {
+    appInsights.trackPageView({ name: "Settings" });
     console.debug("btnSettingsClick got clicked");
     this.setState({ settingsPanelVisible: true });
   };
@@ -128,6 +140,9 @@ export default class App extends React.Component<AppProps, AppState> {
   btnInsertClick = () => {
     console.debug("btnInsert got clicked");
     const selectedImages = this.state.selectedImages;
+
+    appInsights.trackEvent({ name: "Insert" });
+    appInsights.trackMetric({ name: "Insert Image Count", average: selectedImages.length }, {});
 
     // Insert all selected images
     Promise.all(
@@ -393,3 +408,5 @@ export default class App extends React.Component<AppProps, AppState> {
     );
   }
 }
+
+export default withAITracking(reactPlugin, App);
