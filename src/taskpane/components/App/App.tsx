@@ -43,9 +43,10 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
 
     var telemetryInitializer = (envelope: ITelemetryItem) => {
-      envelope.data!.Host = Office.context.diagnostics.host;
+      envelope.data!.OfficeHost = Office.context.diagnostics.host;
       envelope.data!.Platform = Office.context.diagnostics.platform;
-      envelope.data!.Version = Office.context.diagnostics.version;
+      envelope.data!.OfficeVersion = Office.context.diagnostics.version;
+      envelope.data!.Version = process.env.REACT_APP_VERSION;
     };
     appInsights.addTelemetryInitializer(telemetryInitializer);
 
@@ -304,7 +305,7 @@ class App extends React.Component<AppProps, AppState> {
         >
           <h3>About</h3>
           <h4>Office Addin for Unsplash</h4>
-          <p>Version: LOCAL-DEV</p>
+          <p>Version: {process.env.REACT_APP_VERSION || "DEV-LOCAL"}</p>
           <p>© 2022 by knom</p>
           <p>
             <a href="https://github.com/knom/UnsplashOfficeJSAddin/issues" target="_blank" rel="noreferrer">

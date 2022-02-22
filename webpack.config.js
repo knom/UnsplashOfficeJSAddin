@@ -16,15 +16,21 @@ async function getHttpsOptions() {
 }
 
 module.exports = async (env, options) => {
-  const url = process.env.Webserver_Url ?? env.Webserver_Url ?? urlProd;
+  const dev = options.mode === "development";
+  const buildType = dev ? "dev" : "prod";
 
-  if (url === undefined) {
-    console.log("URL paramter needs to be set!");
+  const version = process.env.REACT_APP_VERSION ?? env.REACT_APP_VERSION ?? "0.0.0.0";
+  if (!dev && version == "0.0.0.0") {
+    console.log("REACT_APP_VERSION parameter needs to be set!");
     process.exit(-1);
   }
 
-  const dev = options.mode === "development";
-  const buildType = dev ? "dev" : "prod";
+  const url = process.env.Webserver_Url ?? env.Webserver_Url ?? urlProd;
+  if (!dev && url === undefined) {
+    console.log("Webserver_Url parameter needs to be set!");
+    process.exit(-1);
+  }
+
   const config = {
     devtool: "source-map",
     entry: {
@@ -60,12 +66,12 @@ module.exports = async (env, options) => {
         {
           // css-loader
           test: /\.css$/,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
+          use: ["style-loader", "css-loader", "postcss-loader"],
         },
         {
           // sass/scss loader to load sass-scss style files
           test: /\.(sass|scss)$/,
-          use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+          use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
         },
         {
           test: /\.html$/,
@@ -74,7 +80,7 @@ module.exports = async (env, options) => {
         },
         {
           test: /\.svg$/,
-          use: ['@svgr/webpack'],
+          use: ["@svgr/webpack"],
         },
         {
           test: /\.(png|jpg|jpeg|gif|ico)$/,
@@ -99,7 +105,10 @@ module.exports = async (env, options) => {
               if (dev) {
                 return content;
               } else {
-                return content.toString().replace(new RegExp(urlDev, "g"), url);
+                return content
+                  .toString()
+                  .replace(new RegExp(urlDev, "g"), url)
+                  .replace(new RegExp("<Version>1.0.0.0</Version>", "g"), `<Version>${version}</Version>`);
               }
             },
           },
@@ -123,7 +132,11 @@ module.exports = async (env, options) => {
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
       }),
-      new webpack.EnvironmentPlugin(["REACT_APP_UNSPLASH_API_KEY", "REACT_APP_APPINSIGHTS_API_KEY"]),
+      new webpack.EnvironmentPlugin([
+        "REACT_APP_UNSPLASH_API_KEY",
+        "REACT_APP_APPINSIGHTS_API_KEY",
+        "REACT_APP_VERSION",
+      ]),
     ],
     devServer: {
       hot: true,

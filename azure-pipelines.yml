@@ -12,6 +12,18 @@ stages:
           inputs:
             versionSpec: '16.x'
           displayName: 'Install Node.js'
+        
+        - task: gitversion/setup@0
+          displayName: Setup GitVersion
+          inputs:
+            versionSpec: '5.x'
+          
+        - task: gitversion/execute@0
+          name: GitVersion
+          displayName: Run GitVersion
+          inputs:
+            useConfigFile: true
+            configFilePath: 'GitVersion.yml'
 
         - script: |
             npm install
@@ -32,6 +44,7 @@ stages:
             "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
             "REACT_APP_APPINSIGHTS_API_KEY": $(AppInsights_API_Key)
             "Webserver_Url": $(Webserver_Url)
+            "REACT_APP_VERSION":  $(GitVersion.semVer)
                     
         - script: |
             mv ./dist/manifest.prod.xml ./dist/manifest.xml
