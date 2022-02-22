@@ -30,6 +30,7 @@ stages:
           displayName: 'npm build'
           env:
             "REACT_APP_UNSPLASH_API_KEY": $(Unsplash_API_Key)
+            "REACT_APP_APPINSIGHTS_API_KEY": $(AppInsights_API_Key)
             "Webserver_Url": $(Webserver_Url)
                     
         - script: |

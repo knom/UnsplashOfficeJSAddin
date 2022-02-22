@@ -123,7 +123,7 @@ module.exports = async (env, options) => {
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
       }),
-      new webpack.EnvironmentPlugin(["REACT_APP_UNSPLASH_API_KEY"]),
+      new webpack.EnvironmentPlugin(["REACT_APP_UNSPLASH_API_KEY", "REACT_APP_APPINSIGHTS_API_KEY"]),
     ],
     devServer: {
       hot: true,
