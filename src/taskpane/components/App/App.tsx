@@ -9,6 +9,7 @@ import { ISettingsManager, IUnsplashAddinSettings, OfficeSettingsManager } from 
 import { withAITracking } from "@microsoft/applicationinsights-react-js";
 import { reactPlugin, appInsights } from "../../../AppInsights";
 import { ITelemetryItem } from "@microsoft/applicationinsights-web";
+import { OfficeUtils } from "../../../OfficeUtils";
 
 // import Header from "../Header";
 // import HeroList, { HeroListItem } from "../HeroList";
@@ -137,7 +138,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ selectedImageCount: images.length });
   };
 
-  btnInsertClick = () => {
+  btnInsertClick = async () => {
     console.debug("btnInsert got clicked");
     const selectedImages = this.state.selectedImages;
 
@@ -151,7 +152,6 @@ class App extends React.Component<AppProps, AppState> {
           const si = this.state.selectedImages.filter((p) => p != v);
           this.setState({ selectedImages: si });
 
-          Office.addin.hide();
         });
       })
     ).then(() => {
@@ -247,11 +247,22 @@ class App extends React.Component<AppProps, AppState> {
               if (this.state.settings.insertUnsplashAuthor) {
                 // Insert Unsplash author reference
                 console.debug(`Inserting Unsplash author reference`);
-                // const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
-                const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
+                const credit = `Photo by <a href="https://unsplash.com/@${image.user.username}?utm_source=your_app_name&utm_medium=referral">${image.user.name}</a> on <a href="https://unsplash.com/?utm_source=your_app_name&utm_medium=referral">Unsplash</a>`;
+                // const credit = `Photo by ${image.user.name} (https://unsplash.com/@${image.user.username}) on Unsplash (https://unsplash.com/)`;
 
-                this.insertIntoPptAsync(credit, {
-                  coercionType: Office.CoercionType.Text,
+                PowerPoint.run(async function (context) {
+                  const idx = await OfficeUtils.getSelectedSlideIndexAsync();
+                  let slide = context.presentation.slides.getItemAt(idx - 1);
+
+                  let shapes = slide.shapes;
+                  shapes.load();
+                  await context.sync();
+                  debugger;
+                  var textbox = shapes.addTextBox(credit, { top: 500, width: 960, height: 20 });
+                  textbox.textFrame.textRange.font.size = 15;
+                  textbox.textFrame.textRange.paragraphFormat.horizontalAlignment = "Center";
+
+                  await context.sync();
                 })
                   .catch((reason) => reject(reason))
                   .then(() => {
